@@ -1,6 +1,6 @@
 ﻿# 🔍 URL X-Ray
 
-A fast, safe, and open-source **URL Expander** that allows you to see where a shortened link (like it.ly, 	inyurl, is.gd, etc.) really goes *without* clicking it. 
+A fast, safe, and open-source **URL Expander** that allows you to see where a shortened link (like bit.ly, 	inyurl, is.gd, etc.) really goes *without* clicking it. 
 
 Designed with a strict, dark-mode technical aesthetic and built with pure HTML, CSS, and Vanilla JavaScript.
 
