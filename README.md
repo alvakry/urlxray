@@ -11,7 +11,7 @@ Designed with a strict, dark-mode technical aesthetic and built with pure HTML, 
 - **Hardened Security:** Implements strict Content Security Policy (CSP), 
 o-referrer policies, and contains zero inline scripts.
 - **Beautiful UI:** Pixel-perfect dark theme, fully responsive, and highly accessible (WCAG 2.2 AA compliant).
-- **Dual-Proxy Fallback:** Uses pi.allorigins.win as the primary resolver with an automatic fallback to corsproxy.io to ensure maximum reliability.
+- **Dual-Proxy Fallback:** Uses api.allorigins.win as the primary resolver with an automatic fallback to corsproxy.io to ensure maximum reliability.
 
 ## 🚀 How to Run Locally
 
