@@ -9,7 +9,7 @@
   <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta name="referrer" content="no-referrer">
   <title>URL X-Ray — Expand Shortened URLs Safely</title>
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="icon" type="image/png" href="favicon.png">
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -300,6 +300,48 @@
 
 <script src="app.js"></script>
 <script src="theme.js"></script>
+<script>
+  /* ── Marquee: duplicate items inside track, animate the whole track ── */
+  (function () {
+    var track = document.getElementById('marqueeTrack');
+    if (!track) return;
 
+    /* Grab all original items (set A) */
+    var originalItems = Array.prototype.slice.call(track.children);
+
+    /* Clone each item and append inside the SAME track (A + A = seamless) */
+    originalItems.forEach(function (item) {
+      var clone = item.cloneNode(true);
+      clone.setAttribute('aria-hidden', 'true');
+      track.appendChild(clone);
+    });
+
+    /* After fonts load, measure set A width and set animation duration */
+    function start() {
+      /* set A width = half of total track scrollWidth */
+      var setWidth = track.scrollWidth / 2;
+      var pxPerSec = 80; /* pixels per second — increase to speed up */
+      var duration = setWidth / pxPerSec;
+
+      var style = document.createElement('style');
+      style.textContent =
+        '@keyframes marquee-scroll {' +
+        '  from { transform: translateX(0); }' +
+        '  to   { transform: translateX(-' + setWidth + 'px); }' +
+        '}' +
+        '#marqueeTrack {' +
+        '  animation: marquee-scroll ' + duration + 's linear infinite;' +
+        '}' +
+        '#marqueeTrack:hover { animation-play-state: paused; }';
+      document.head.appendChild(style);
+    }
+
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(start);
+    } else {
+      window.addEventListener('load', start);
+    }
+  })();
+</script>
 </body>
 </html>
