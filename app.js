@@ -1,4 +1,4 @@
-﻿const PROXY_SERVICES = [
+const PROXY_SERVICES = [
     (url) => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
 ];
 
