@@ -1,62 +1,104 @@
-# URL X-Ray
+<div align="center">
 
-A fast, safe, and open-source **URL expander** — see where a shortened link (bit.ly, tinyurl, is.gd, etc.) really goes *without* clicking it.
+<img src="preview.png" alt="URL X-Ray Preview" width="160" />
 
-Built with pure HTML, CSS, and vanilla JavaScript. No build tools. No dependencies. No server required.
+# URL X-RAY
+
+**See where shortened links really go — before you click.**
+
+[![HTML](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/HTML)
+[![CSS](https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white)](https://developer.mozilla.org/en-US/docs/Web/CSS)
+[![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![License: MIT](https://img.shields.io/badge/License-MIT-c8ff00?style=flat-square)](LICENSE)
+[![No Dependencies](https://img.shields.io/badge/dependencies-none-brightgreen?style=flat-square)](#)
+
+</div>
+
+---
+
+```
+paste url → follow redirects → see destination
+```
+
+URL X-Ray is a zero-dependency, browser-only tool that expands shortened URLs (bit.ly, tinyurl, t.co, etc.) and reveals their final destination — without you ever clicking them.
+
+---
 
 ## Features
 
-- **Zero server required** — runs entirely in the browser using public proxy APIs to safely follow HTTP redirects
-- **Safe by design** — does not execute JavaScript or load page content from the destination URL
-- **Hardened security** — strict Content Security Policy (CSP), no-referrer policy, zero inline scripts
-- **Dual-proxy fallback** — uses `api.allorigins.win` as primary with automatic fallback to `corsproxy.io`
-- **Light / dark mode** — system preference detected automatically, persisted in localStorage
-- **Fully responsive** — mobile drawer, touch-friendly, accessible (WCAG 2.2 AA)
-- **Custom cursor + scroll animations** — powered by `theme.js` from the alvakry-theme design system
+| | |
+|---|---|
+| 🛡 **Safe by design** | Never loads destination page content or executes remote scripts |
+| 🔒 **Zero tracking** | No analytics, no storage, no server — runs entirely in your browser |
+| ⚡ **Instant results** | Dual-proxy fallback ensures maximum uptime and speed |
+| 🌗 **Light / dark mode** | Respects system preference, persisted across sessions |
+| 📱 **Fully responsive** | Mobile drawer, touch-friendly, WCAG 2.2 AA accessible |
+| ✦ **Designed with care** | alvakry-theme — Space Grotesk + Space Mono, custom cursor, scroll animations |
 
-## Tech stack
+---
 
-| Layer      | Detail                                      |
-|------------|---------------------------------------------|
-| Markup     | Semantic HTML5                              |
-| Styles     | CSS custom properties, alvakry-theme system |
-| Fonts      | Space Grotesk + Space Mono (Google Fonts)   |
-| Logic      | Vanilla JS (`app.js`)                       |
-| Theme / UX | `theme.js` — cursor, dark mode, hamburger   |
+## How it works
+
+```
+┌─────────────────────────────────────────────────────┐
+│  you paste      →  proxy fetches   →  final URL     │
+│  https://bit.ly/xyz   all redirects     revealed    │
+└─────────────────────────────────────────────────────┘
+```
+
+1. You paste a shortened URL into the tool
+2. The request is sent through a CORS proxy (`api.allorigins.win`, fallback to `corsproxy.io`)
+3. The proxy follows every HTTP 301/302 redirect chain
+4. The resolved final URL is returned and displayed — destination scripts never execute
+
+---
+
+## Stack
+
+```
+urlxray-main/
+├── index.html   — semantic markup, sections, aria roles
+├── style.css    — alvakry-theme design system + all component styles
+├── theme.js     — dark mode, custom cursor, hamburger, scroll fade-in
+├── app.js       — URL resolution logic, dual-proxy, clipboard
+└── favicon.png  — icon
+```
+
+No npm. No bundler. No framework. Open `index.html` and it works.
+
+---
 
 ## Run locally
-
-Static frontend — no build step needed.
 
 ```bash
 git clone https://github.com/alvakry/url-xray.git
 cd url-xray
-# open index.html in your browser, or serve with any static server:
+
+# option 1 — just open the file
+start index.html
+
+# option 2 — serve with any static server
 npx serve .
 ```
 
-## How it works
+---
 
-1. You paste a shortened URL
-2. The app sends a request through a CORS proxy
-3. The proxy follows all HTTP 301/302 redirects and returns the final destination
-4. The resolved URL is shown — no malicious scripts can execute because the destination page is never loaded
+## Supported shorteners
 
-## File structure
+`bit.ly` · `tinyurl.com` · `is.gd` · `shorturl.at` · `ow.ly` · `t.co` · `rb.gy` · `cutt.ly` · and any other service that uses standard HTTP redirects.
 
-```
-urlxray-main/
-├── index.html   — markup and page structure
-├── style.css    — alvakry-theme design system + component styles
-├── theme.js     — dark mode toggle, custom cursor, hamburger, scroll fade-in
-├── app.js       — URL resolution logic
-└── favicon.svg  — site icon
-```
+---
 
-## Author
+## Security
 
-Open source by [@alvakry](https://github.com/alvakry)
+- Strict **Content Security Policy** (CSP) — no inline scripts, no external connections beyond the two declared proxies
+- **`no-referrer`** policy — destination sites cannot see where the request originated
+- Destination page is **never loaded** — only the final redirect URL is read
 
-## License
+---
 
-MIT
+<div align="center">
+
+made by <a href="https://github.com/alvakry"><strong>@alvakry</strong></a> · MIT License
+
+</div>
