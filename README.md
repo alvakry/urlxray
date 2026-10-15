@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="preview.png" alt="URL X-Ray Preview" width="160" />
+<img src="favicon.png" alt="URL X-Ray Preview" width="160" />
 
 # URL X-RAY
 
