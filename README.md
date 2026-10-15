@@ -1,39 +1,62 @@
-﻿# 🔍 URL X-Ray
+# URL X-Ray
 
-A fast, safe, and open-source **URL Expander** that allows you to see where a shortened link (like bit.ly, 	inyurl, is.gd, etc.) really goes *without* clicking it. 
+A fast, safe, and open-source **URL expander** — see where a shortened link (bit.ly, tinyurl, is.gd, etc.) really goes *without* clicking it.
 
-Designed with a strict, dark-mode technical aesthetic and built with pure HTML, CSS, and Vanilla JavaScript.
+Built with pure HTML, CSS, and vanilla JavaScript. No build tools. No dependencies. No server required.
 
-## ✨ Features
+## Features
 
-- **Zero Server Required:** Runs entirely in the browser using public proxy APIs to safely follow HTTP redirects.
-- **Safe & Secure:** Does not execute JavaScript or load page content from the destination URL, keeping you safe from malicious sites.
-- **Hardened Security:** Implements strict Content Security Policy (CSP), 
-o-referrer policies, and contains zero inline scripts.
-- **Beautiful UI:** Pixel-perfect dark theme, fully responsive, and highly accessible (WCAG 2.2 AA compliant).
-- **Dual-Proxy Fallback:** Uses api.allorigins.win as the primary resolver with an automatic fallback to corsproxy.io to ensure maximum reliability.
+- **Zero server required** — runs entirely in the browser using public proxy APIs to safely follow HTTP redirects
+- **Safe by design** — does not execute JavaScript or load page content from the destination URL
+- **Hardened security** — strict Content Security Policy (CSP), no-referrer policy, zero inline scripts
+- **Dual-proxy fallback** — uses `api.allorigins.win` as primary with automatic fallback to `corsproxy.io`
+- **Light / dark mode** — system preference detected automatically, persisted in localStorage
+- **Fully responsive** — mobile drawer, touch-friendly, accessible (WCAG 2.2 AA)
+- **Custom cursor + scroll animations** — powered by `theme.js` from the alvakry-theme design system
 
-## 🚀 How to Run Locally
+## Tech stack
 
-Because this is a completely static frontend app, you don't need Node.js, Python, or any complicated build tools!
+| Layer      | Detail                                      |
+|------------|---------------------------------------------|
+| Markup     | Semantic HTML5                              |
+| Styles     | CSS custom properties, alvakry-theme system |
+| Fonts      | Space Grotesk + Space Mono (Google Fonts)   |
+| Logic      | Vanilla JS (`app.js`)                       |
+| Theme / UX | `theme.js` — cursor, dark mode, hamburger   |
 
-1. Clone the repository:
-   `bash
-   git clone https://github.com/alvakry/url-xray.git
-   `
-2. Open the directory and double-click index.html in your favorite web browser.
-3. *Done!*
+## Run locally
 
-## 🛠️ How it Works
+Static frontend — no build step needed.
 
-When you input a shortened URL, the app sends a request through a CORS proxy. These proxies follow all HTTP 301/302 redirects and return the final destination URL. 
+```bash
+git clone https://github.com/alvakry/url-xray.git
+cd url-xray
+# open index.html in your browser, or serve with any static server:
+npx serve .
+```
 
-Because the request happens via the proxy API (and not via an iframe or direct navigation), malicious scripts or trackers at the destination cannot execute on your machine.
+## How it works
 
-## 👤 Author
+1. You paste a shortened URL
+2. The app sends a request through a CORS proxy
+3. The proxy follows all HTTP 301/302 redirects and returns the final destination
+4. The resolved URL is shown — no malicious scripts can execute because the destination page is never loaded
 
-Open source & secured by [@alvakry](https://github.com/alvakry).
+## File structure
 
-## 📄 License
+```
+urlxray-main/
+├── index.html   — markup and page structure
+├── style.css    — alvakry-theme design system + component styles
+├── theme.js     — dark mode toggle, custom cursor, hamburger, scroll fade-in
+├── app.js       — URL resolution logic
+└── favicon.svg  — site icon
+```
 
-This project is open-source and available under the [MIT License](LICENSE).
+## Author
+
+Open source by [@alvakry](https://github.com/alvakry)
+
+## License
+
+MIT
