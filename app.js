@@ -1,347 +1,111 @@
-<!DOCTYPE html>
-<html lang="en" data-theme="light" data-lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="URL X-Ray — Find out where shortened URLs lead to without clicking. Safe URL expander tool.">
-  <meta name="keywords" content="url expander, url xray, short urls, tinyurl, bit.ly, safe link checker">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://api.allorigins.win https://corsproxy.io; style-src 'self' 'unsafe-inline'; font-src https://fonts.gstatic.com; img-src 'self' data:;">
-  <meta http-equiv="X-Content-Type-Options" content="nosniff">
-  <meta name="referrer" content="no-referrer">
-  <title>URL X-Ray — Expand Shortened URLs Safely</title>
-  <link rel="icon" type="image/png" href="favicon.png">
+const PROXY_SERVICES = [
+    (url) => `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
+];
 
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
-
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-
-<!-- Custom cursor -->
-<div class="cursor" id="cursor"></div>
-
-<!-- Skip nav -->
-<a href="#main-content" class="skip-nav">Skip to content</a>
-
-<!-- ══════════════════════════════════════
-     NAV
-     ══════════════════════════════════════ -->
-<div class="container">
-  <nav class="nav">
-    <a class="nav-logo" href="/">URL<strong>X-RAY</strong><span class="dim">.exe</span></a>
-
-    <ul class="nav-links">
-      <li><a href="#how-it-works">how it works</a></li>
-      <li><a href="#shorteners">shorteners</a></li>
-      <li><a href="#why">why</a></li>
-    </ul>
-
-    <div class="nav-controls">
-      <button class="pill-btn" id="themeBtn" aria-label="Toggle theme">
-        <span id="themeIcon">☾</span>
-        <span id="themeLabel">dark</span>
-      </button>
-    </div>
-
-    <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
-      <span></span><span></span><span></span>
-    </button>
-  </nav>
-</div>
-
-<!-- Mobile drawer -->
-<div class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
-  <ul>
-    <li><a href="#how-it-works" class="drawer-link">how it works</a></li>
-    <li><a href="#shorteners"   class="drawer-link">shorteners</a></li>
-    <li><a href="#why"          class="drawer-link">why</a></li>
-  </ul>
-  <div class="drawer-controls">
-    <button class="pill-btn" id="themeBtnMobile" aria-label="Toggle theme">
-      <span id="themeIconM">☾</span>
-      <span id="themeLabelM">dark</span>
-    </button>
-  </div>
-  <p class="drawer-foot">URLXRAY.exe — v2.0</p>
-</div>
-
-<!-- ══════════════════════════════════════
-     MARQUEE
-     ══════════════════════════════════════ -->
-<div class="marquee-wrap" aria-hidden="true">
-  <div class="marquee-track">
-    <!-- set A -->
-    <span class="marquee-item"><span class="star">✦</span> safe link preview</span>
-    <span class="marquee-item"><span class="star">✦</span> no click required</span>
-    <span class="marquee-item"><span class="star">✦</span> zero tracking</span>
-    <span class="marquee-item"><span class="star">✦</span> follows redirects</span>
-    <span class="marquee-item"><span class="star">✦</span> instant results</span>
-    <span class="marquee-item"><span class="star">✦</span> always free</span>
-    <span class="marquee-item"><span class="star">✦</span> open source</span>
-    <span class="marquee-item"><span class="star">✦</span> bit.ly</span>
-    <span class="marquee-item"><span class="star">✦</span> tinyurl</span>
-    <span class="marquee-item"><span class="star">✦</span> t.co</span>
-    <!-- set B (identical copy for seamless loop) -->
-    <span class="marquee-item" aria-hidden="true"><span class="star">✦</span> safe link preview</span>
-    <span class="marquee-item" aria-hidden="true"><span class="star">✦</span> no click required</span>
-    <span class="marquee-item" aria-hidden="true"><span class="star">✦</span> zero tracking</span>
-    <span class="marquee-item" aria-hidden="true"><span class="star">✦</span> follows redirects</span>
-    <span class="marquee-item" aria-hidden="true"><span class="star">✦</span> instant results</span>
-    <span class="marquee-item" aria-hidden="true"><span class="star">✦</span> always free</span>
-    <span class="marquee-item" aria-hidden="true"><span class="star">✦</span> open source</span>
-    <span class="marquee-item" aria-hidden="true"><span class="star">✦</span> bit.ly</span>
-    <span class="marquee-item" aria-hidden="true"><span class="star">✦</span> tinyurl</span>
-    <span class="marquee-item" aria-hidden="true"><span class="star">✦</span> t.co</span>
-  </div>
-</div>
-
-<div class="container">
-
-  <!-- ══════════════════════════════════════
-       HERO / TOOL SECTION
-       ══════════════════════════════════════ -->
-  <section class="hero-section" id="main-content">
-
-    <div class="status" style="margin-bottom: 2.5rem;">
-      <span class="status-dot"></span>
-      <span>online — no clicks. no risk.</span>
-    </div>
-
-    <div class="hero-tag">v2.0 — URL EXPANDER</div>
-
-    <h1 class="display">
-      Where does this<br>link <em class="glitch" data-text="really go?">really go?</em>
-    </h1>
-
-    <p class="subtitle" style="margin-bottom: 3rem;">
-      Paste any shortened URL to reveal its destination <strong>before</strong> you click it.
-      No account. No tracking. Instant.
-    </p>
-
-    <!-- Tool card -->
-    <div class="tool-card" role="region" aria-label="URL expander tool">
-      <form id="xrayForm" novalidate>
-        <label for="shortenedUrl" class="input-label">Shortened URL</label>
-        <div class="input-group">
-          <input
-            type="text"
-            id="shortenedUrl"
-            name="shortenedUrl"
-            placeholder="https://bit.ly/abc123"
-            required
-            autocomplete="off"
-            spellcheck="false"
-            aria-describedby="input-hint"
-          >
-          <button type="submit" id="xrayBtn" aria-label="X-Ray this URL">
-            <span class="btn-icon" aria-hidden="true">→</span>
-            <span class="btn-text">X-RAY</span>
-          </button>
-        </div>
-        <span id="input-hint" style="display:none;">Enter a shortened URL starting with http:// or https://</span>
-      </form>
-
-      <!-- Results -->
-      <div id="resultArea" class="result-area hidden" aria-live="polite" aria-atomic="true">
-
-        <div id="loadingState" class="state loading-state hidden" aria-busy="true">
-          <div class="spinner" aria-hidden="true"></div>
-          <p class="mono-sm">Following redirects…</p>
-        </div>
-
-        <div id="successState" class="state success-state hidden" role="status">
-          <div class="result-header">
-            <span class="result-status-label">✓ Destination found</span>
-          </div>
-          <a id="resultUrl" href="#" target="_blank" rel="noopener noreferrer" class="result-link"></a>
-          <div class="result-meta">
-            <span id="redirectCount" class="tag"></span>
-            <span id="finalDomain"   class="tag tag-accent"></span>
-          </div>
-          <div class="result-actions">
-            <button class="btn-outline btn-copy" aria-label="Copy resolved URL to clipboard">
-              Copy URL
-            </button>
-            <a id="openLink" href="#" target="_blank" rel="noopener noreferrer" class="btn-outline btn-open" aria-label="Open destination URL in new tab">
-              ↗ Open safely
-            </a>
-          </div>
-        </div>
-
-        <div id="errorState" class="state error-state hidden" role="alert">
-          <p id="errorMsg" class="error-msg"></p>
-          <p class="mono-sm" style="margin-top: 0.4rem;">
-            Make sure the URL starts with <code>http://</code> or <code>https://</code>
-          </p>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- ══════════════════════════════════════
-       HOW IT WORKS
-       ══════════════════════════════════════ -->
-  <section id="how-it-works">
-    <p class="label">How it works</p>
-
-    <div class="steps-grid">
-
-      <div class="step-card">
-        <div class="step-number">01</div>
-        <h3>Paste the link</h3>
-        <p class="body-text">Copy any shortened URL from email, a text message, or social media.</p>
-      </div>
-
-      <div class="step-card">
-        <div class="step-number">02</div>
-        <h3>We follow redirects</h3>
-        <p class="body-text">The tool traces every redirect hop until it reaches the final destination.</p>
-      </div>
-
-      <div class="step-card">
-        <div class="step-number">03</div>
-        <h3>See the destination</h3>
-        <p class="body-text">You get the real URL — decide for yourself if it is safe to visit.</p>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- ══════════════════════════════════════
-       POPULAR SHORTENERS
-       ══════════════════════════════════════ -->
-  <section id="shorteners">
-    <p class="label">Popular shorteners</p>
-    <p class="body-text" style="margin-bottom: 2rem;">Works with all major services, including:</p>
-
-    <div class="shorteners-grid">
-      <a href="https://bit.ly"       target="_blank" rel="noopener noreferrer" class="row-item shortener-item" aria-label="bit.ly">
-        <span class="row-title">bit.ly</span>
-        <span class="row-meta">↗</span>
-      </a>
-      <a href="https://tinyurl.com"  target="_blank" rel="noopener noreferrer" class="row-item shortener-item" aria-label="tinyurl.com">
-        <span class="row-title">tinyurl.com</span>
-        <span class="row-meta">↗</span>
-      </a>
-      <a href="https://is.gd"        target="_blank" rel="noopener noreferrer" class="row-item shortener-item" aria-label="is.gd">
-        <span class="row-title">is.gd</span>
-        <span class="row-meta">↗</span>
-      </a>
-      <a href="https://shorturl.at"  target="_blank" rel="noopener noreferrer" class="row-item shortener-item" aria-label="shorturl.at">
-        <span class="row-title">shorturl.at</span>
-        <span class="row-meta">↗</span>
-      </a>
-      <a href="https://ow.ly"        target="_blank" rel="noopener noreferrer" class="row-item shortener-item" aria-label="ow.ly">
-        <span class="row-title">ow.ly</span>
-        <span class="row-meta">↗</span>
-      </a>
-      <a href="https://t.co"         target="_blank" rel="noopener noreferrer" class="row-item shortener-item" aria-label="t.co">
-        <span class="row-title">t.co</span>
-        <span class="row-meta">↗</span>
-      </a>
-      <a href="https://rb.gy"        target="_blank" rel="noopener noreferrer" class="row-item shortener-item" aria-label="rb.gy">
-        <span class="row-title">rb.gy</span>
-        <span class="row-meta">↗</span>
-      </a>
-      <a href="https://cutt.ly"      target="_blank" rel="noopener noreferrer" class="row-item shortener-item" aria-label="cutt.ly">
-        <span class="row-title">cutt.ly</span>
-        <span class="row-meta">↗</span>
-      </a>
-    </div>
-  </section>
-
-  <!-- ══════════════════════════════════════
-       WHY
-       ══════════════════════════════════════ -->
-  <section id="why">
-    <p class="label">Why use URL X-Ray?</p>
-
-    <div class="features-grid">
-
-      <div class="feature-card">
-        <div class="feature-icon">🛡</div>
-        <h3>Stay safe online</h3>
-        <p class="body-text">Verify links before clicking to avoid phishing sites, malware, or spam.</p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon">◎</div>
-        <h3>Zero tracking</h3>
-        <p class="body-text">We do not store your URLs or track your activity. Ever.</p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon">⚡</div>
-        <h3>Fast and free</h3>
-        <p class="body-text">Instant results with no account required. Always free to use.</p>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- ══════════════════════════════════════
-       FOOTER
-       ══════════════════════════════════════ -->
-  <footer class="footer">
-    <span class="mono-sm">
-      © 2026 <strong style="color: var(--fg);">URL X-Ray</strong> — a safe way to inspect shortened links.
-    </span>
-    <span class="mono-sm" style="font-style: italic;">
-      open source by
-      <a href="https://github.com/alvakry" target="_blank" rel="noopener noreferrer" style="color: var(--accent-text); text-decoration: none; font-weight: 700;">@alvakry</a>
-    </span>
-  </footer>
-
-</div><!-- /container -->
-
-<script src="app.js"></script>
-<script src="theme.js"></script>
-<script>
-  /* ── Marquee: duplicate items inside track, animate the whole track ── */
-  (function () {
-    var track = document.getElementById('marqueeTrack');
-    if (!track) return;
-
-    /* Grab all original items (set A) */
-    var originalItems = Array.prototype.slice.call(track.children);
-
-    /* Clone each item and append inside the SAME track (A + A = seamless) */
-    originalItems.forEach(function (item) {
-      var clone = item.cloneNode(true);
-      clone.setAttribute('aria-hidden', 'true');
-      track.appendChild(clone);
+function showState(stateId) {
+    ['loadingState', 'successState', 'errorState'].forEach(id => {
+        const el = document.getElementById(id);
+        el.classList.remove('visible');
+        el.classList.add('hidden');
+        el.style.display = '';
     });
+    const target = document.getElementById(stateId);
+    target.classList.remove('hidden');
+    target.classList.add('visible');
+    target.style.display = 'flex';
+    const resultArea = document.getElementById('resultArea');
+    resultArea.classList.remove('hidden');
+}
 
-    /* After fonts load, measure set A width and set animation duration */
-    function start() {
-      /* set A width = half of total track scrollWidth */
-      var setWidth = track.scrollWidth / 2;
-      var pxPerSec = 80; /* pixels per second — increase to speed up */
-      var duration = setWidth / pxPerSec;
-
-      var style = document.createElement('style');
-      style.textContent =
-        '@keyframes marquee-scroll {' +
-        '  from { transform: translateX(0); }' +
-        '  to   { transform: translateX(-' + setWidth + 'px); }' +
-        '}' +
-        '#marqueeTrack {' +
-        '  animation: marquee-scroll ' + duration + 's linear infinite;' +
-        '}' +
-        '#marqueeTrack:hover { animation-play-state: paused; }';
-      document.head.appendChild(style);
+function normalize(url) {
+    url = url.trim();
+    if (!/^https?:\/\//i.test(url)) {
+        url = 'https://' + url;
     }
+    return url;
+}
 
-    if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(start);
-    } else {
-      window.addEventListener('load', start);
+function getDomain(url) {
+    try {
+        return new URL(url).hostname.replace(/^www\./, '');
+    } catch {
+        return url;
     }
-  })();
-</script>
-</body>
-</html>
+}
+
+async function expandUrl(event) {
+    event.preventDefault();
+    const inputEl = document.getElementById('shortenedUrl');
+    const btn = document.getElementById('xrayBtn');
+    let rawUrl = inputEl.value.trim();
+    if (!rawUrl) return;
+    const url = normalize(rawUrl);
+    showState('loadingState');
+    btn.classList.add('loading');
+    try {
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`;
+        const res = await fetch(proxyUrl, { signal: AbortSignal.timeout(12000) });
+        if (!res.ok) throw new Error(`Proxy responded with ${res.status}`);
+        const data = await res.json();
+        const finalUrl = (data.status && data.status.url) ? data.status.url : url;
+        showSuccess(url, finalUrl);
+    } catch (err) {
+        try {
+            const directRes = await fetch(`https://corsproxy.io/?${encodeURIComponent(url)}`, {
+                method: 'HEAD',
+                redirect: 'follow',
+                signal: AbortSignal.timeout(10000),
+            });
+            const finalUrl = directRes.url ? decodeURIComponent(directRes.url.replace('https://corsproxy.io/?', '')) : url;
+            showSuccess(url, finalUrl);
+        } catch (err2) {
+            showError(err2.message || 'Could not resolve the URL.');
+        }
+    } finally {
+        btn.classList.remove('loading');
+    }
+}
+
+function showSuccess(originalUrl, finalUrl) {
+    const resultLink = document.getElementById('resultUrl');
+    const openLink = document.getElementById('openLink');
+    const redirectCount = document.getElementById('redirectCount');
+    const finalDomain = document.getElementById('finalDomain');
+    const changed = originalUrl !== finalUrl;
+    resultLink.href = finalUrl;
+    resultLink.textContent = finalUrl;
+    openLink.href = finalUrl;
+    redirectCount.textContent = changed ? '↪ Redirect detected' : '✓ No redirect';
+    finalDomain.textContent = '🌐 ' + getDomain(finalUrl);
+    showState('successState');
+}
+
+function showError(msg) {
+    document.getElementById('errorMsg').textContent = msg;
+    showState('errorState');
+}
+
+async function copyResult() {
+    const url = document.getElementById('resultUrl').textContent;
+    try {
+        await navigator.clipboard.writeText(url);
+        const btn = document.querySelector('.btn-copy');
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<span aria-hidden="true">✅</span> Copied!';
+        setTimeout(() => { btn.innerHTML = orig; }, 2000);
+    } catch {
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const form = document.getElementById('xrayForm');
+    const copyBtn = document.querySelector('.btn-copy');
+    if (form) form.addEventListener('submit', expandUrl);
+    if (copyBtn) copyBtn.addEventListener('click', copyResult);
+});
