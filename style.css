@@ -198,16 +198,16 @@ body {
   width: 32px; height: 32px;
   padding: 0;
   flex-shrink: 0;
-  background: transparent;
-  border: 1.5px solid var(--rule);
+  background: var(--surface);
+  border: 1.5px solid var(--ink-5);
   border-radius: 7px;
   cursor: pointer;
-  color: var(--ink-3);
+  color: var(--ink-2);
   transition: background 0.12s, border-color 0.12s, color 0.12s;
 }
 .theme-btn:hover {
   background: var(--hover);
-  border-color: var(--ink-5);
+  border-color: var(--ink-3);
   color: var(--ink);
 }
 .theme-btn svg { width: 15px; height: 15px; flex-shrink: 0; display: block; }
