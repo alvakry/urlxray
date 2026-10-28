@@ -1,204 +1,195 @@
-/**
- * alvakry-theme — base JS
- * ─────────────────────────────────────────
- * Drop this script at the bottom of <body>.
- * Handles: theme toggle, lang toggle, custom
- * cursor, hamburger menu, scroll fade-in.
- *
- * Requirements in HTML:
- *   Cursor    → <div class="cursor" id="cursor"></div>
- *   Theme btn → id="themeBtn"  + children id="themeIcon" id="themeLabel"
- *   Theme btn (mobile) → id="themeBtnMobile" + id="themeIconM" id="themeLabelM"
- *   Lang btns → id="btnEN" id="btnID" id="btnENM" id="btnIDM"
- *   Hamburger → id="hamburger"  (button)
- *   Drawer    → id="mobileDrawer"
- *   Drawer links → class="drawer-link"
- *
- * i18n: add data-i18n="key" to any element whose textContent should swap.
- *       Extend the `strings` object below with your own keys.
- *
- * Bilingual content: wrap text in <span lang="en">…</span> and
- *   <span lang="id">…</span> — CSS hides the inactive one automatically.
- */
+/* ═══════════════════════════════════════════════
+   URL X-Ray — interactions
+   Ported verbatim from whitewebsite/script.js
+   with theme-toggle wired to data-theme on <html>
+═══════════════════════════════════════════════ */
 
-(function () {
+const prefersReducedMotion = window.matchMedia(
+  '(prefers-reduced-motion: reduce)'
+).matches;
 
-  /* ══════════════════════════════════════
-     i18n strings  ← add your own keys here
-     ══════════════════════════════════════ */
-  var strings = {
-    en: {
-      'nav.home':     'home',
-      'nav.work':     'work',
-      'nav.about':    'about',
-      'nav.thoughts': 'thoughts',
-      'nav.contact':  'contact',
-      /* add more keys as needed */
-    },
-    id: {
-      'nav.home':     'beranda',
-      'nav.work':     'karya',
-      'nav.about':    'tentang',
-      'nav.thoughts': 'pikiran',
-      'nav.contact':  'kontak',
+/* ─── CURSOR ─── */
+(function initCursor() {
+  if (prefersReducedMotion) return;
+
+  const dot  = document.querySelector('.cursor');
+  const ring = document.querySelector('.cursor-ring');
+  if (!dot || !ring) return;
+
+  const DOT_HALF  = 5;
+  const RING_HALF = 18;
+
+  let mx = -200, my = -200;
+  let rx = -200, ry = -200;
+  let rafId = null;
+  let isRunning = false;
+
+  function step() {
+    if (!isRunning) return;
+    dot.style.transform  = `translate(${mx - DOT_HALF}px, ${my - DOT_HALF}px)`;
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.transform = `translate(${rx - RING_HALF}px, ${ry - RING_HALF}px)`;
+    rafId = requestAnimationFrame(step);
+  }
+
+  function start() { if (isRunning) return; isRunning = true; rafId = requestAnimationFrame(step); }
+  function stop()  { isRunning = false; if (rafId) { cancelAnimationFrame(rafId); rafId = null; } }
+
+  document.addEventListener('visibilitychange', () => document.hidden ? stop() : start());
+
+  document.addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; }, { passive: true });
+
+  document.addEventListener('mouseover', (e) => {
+    if (e.target.closest('a, button, [data-hover]')) {
+      dot.classList.add('hover'); ring.classList.add('hover');
     }
-  };
+  }, { passive: true });
 
-  /* ══════════════════════════════════════
-     LANGUAGE
-     ══════════════════════════════════════ */
-  function setLang(lang) {
-    document.documentElement.setAttribute('data-lang', lang);
-    document.documentElement.setAttribute('lang', lang);
+  document.addEventListener('mouseout', (e) => {
+    if (e.target.closest('a, button, [data-hover]')) {
+      dot.classList.remove('hover'); ring.classList.remove('hover');
+    }
+  }, { passive: true });
 
-    /* swap data-i18n text nodes */
-    document.querySelectorAll('[data-i18n]').forEach(function (el) {
-      var key = el.dataset.i18n;
-      if (strings[lang] && strings[lang][key]) el.textContent = strings[lang][key];
+  document.addEventListener('mouseleave', () => { dot.style.opacity = '0'; ring.style.opacity = '0'; });
+  document.addEventListener('mouseenter', () => { dot.style.opacity = '1'; ring.style.opacity = '1'; });
+
+  start();
+})();
+
+
+/* ─── SCROLL: progress + nav ─── */
+(function initScroll() {
+  const progress = document.querySelector('.scroll-progress');
+  const nav      = document.querySelector('.nav');
+  let ticking = false;
+
+  function onScroll() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(() => {
+      const h   = document.documentElement;
+      const pct = h.scrollTop / (h.scrollHeight - h.clientHeight);
+      if (progress) progress.style.transform = `scaleX(${pct})`;
+      if (nav)      nav.classList.toggle('scrolled', h.scrollTop > 20);
+      ticking = false;
     });
-
-    /* active state on pills */
-    ['btnEN', 'btnENM'].forEach(function (id) {
-      var el = document.getElementById(id);
-      if (el) el.classList.toggle('active', lang === 'en');
-    });
-    ['btnID', 'btnIDM'].forEach(function (id) {
-      var el = document.getElementById(id);
-      if (el) el.classList.toggle('active', lang === 'id');
-    });
-
-    /* hook for custom re-render (override in your page script) */
-    if (typeof window.onLangChange === 'function') window.onLangChange(lang);
-
-    localStorage.setItem('alvakry_lang', lang);
   }
 
-  /* expose globally so onclick="setLang('id')" works in HTML */
-  window.setLang = setLang;
+  window.addEventListener('scroll', onScroll, { passive: true });
+})();
 
-  /* ══════════════════════════════════════
-     THEME
-     ══════════════════════════════════════ */
+
+/* ─── REVEAL ─── */
+(function initReveal() {
+  const els = document.querySelectorAll('.reveal');
+  if (!els.length) return;
+
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const el = entry.target;
+      el.classList.add('will-animate');
+      requestAnimationFrame(() => {
+        el.classList.add('visible');
+        el.addEventListener('transitionend', () => el.classList.remove('will-animate'), { once: true });
+      });
+      obs.unobserve(el);
+    });
+  }, { threshold: 0.08, rootMargin: '0px 0px -32px 0px' });
+
+  els.forEach(el => obs.observe(el));
+})();
+
+
+/* ─── STAGGER ─── */
+(function initStagger() {
+  const parents = document.querySelectorAll('[data-stagger]');
+  if (!parents.length) return;
+
+  const obs = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      entry.target.classList.add('stagger-ready');
+      obs.unobserve(entry.target);
+    });
+  }, { threshold: 0.05 });
+
+  parents.forEach(el => obs.observe(el));
+})();
+
+
+/* ─── THEME TOGGLE ─── */
+(function initTheme() {
   function applyTheme(theme) {
-    var isDark = theme === 'dark';
     document.documentElement.setAttribute('data-theme', theme);
+    // icons toggled by CSS; update drawer label for clarity
+    const label = document.getElementById('drawerThemeLabel');
+    if (label) label.textContent = theme === 'dark' ? 'Switch to light' : 'Switch to dark';
+    localStorage.setItem('urlxray_theme', theme);
+  }
 
-    var icon  = isDark ? '☀︎' : '☾';
-    var label = isDark ? 'light' : 'dark';
+  const saved = localStorage.getItem('urlxray_theme') ||
+    (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  applyTheme(saved);
 
-    var ids = [
-      ['themeIcon',  'themeLabel'],
-      ['themeIconM', 'themeLabelM'],
-    ];
-    ids.forEach(function (pair) {
-      var iconEl  = document.getElementById(pair[0]);
-      var labelEl = document.getElementById(pair[1]);
-      if (iconEl)  iconEl.textContent  = icon;
-      if (labelEl) labelEl.textContent = label;
+  document.addEventListener('DOMContentLoaded', () => {
+    ['themeBtn','themeBtnMobile'].forEach(id => {
+      const btn = document.getElementById(id);
+      if (btn) btn.addEventListener('click', () => {
+        const cur = document.documentElement.getAttribute('data-theme') || 'light';
+        applyTheme(cur === 'dark' ? 'light' : 'dark');
+      });
     });
+  });
+})();
 
-    localStorage.setItem('alvakry_theme', theme);
-  }
 
-  function toggleTheme() {
-    var cur = document.documentElement.getAttribute('data-theme') || 'light';
-    applyTheme(cur === 'dark' ? 'light' : 'dark');
-  }
-
-  window.toggleTheme = toggleTheme;
-
-  /* ══════════════════════════════════════
-     HAMBURGER / MOBILE DRAWER
-     ══════════════════════════════════════ */
-  function toggleMenu(open) {
-    var hamburger = document.getElementById('hamburger');
-    var drawer    = document.getElementById('mobileDrawer');
+/* ─── HAMBURGER ─── */
+(function initMenu() {
+  document.addEventListener('DOMContentLoaded', () => {
+    const hamburger = document.getElementById('hamburger');
+    const drawer    = document.getElementById('mobileDrawer');
     if (!hamburger || !drawer) return;
 
-    hamburger.classList.toggle('open', open);
-    drawer.classList.toggle('open', open);
-    hamburger.setAttribute('aria-expanded', String(open));
-    drawer.setAttribute('aria-hidden', String(!open));
-    document.body.style.overflow = open ? 'hidden' : '';
-  }
-
-  /* ══════════════════════════════════════
-     CUSTOM CURSOR  (desktop only)
-     ══════════════════════════════════════ */
-  function initCursor() {
-    var cursor = document.getElementById('cursor');
-    if (!cursor) return;
-    if (window.matchMedia('(hover: none)').matches) return; /* touch device */
-
-    document.addEventListener('mousemove', function (e) {
-      cursor.style.left = e.clientX + 'px';
-      cursor.style.top  = e.clientY + 'px';
-    });
-    document.querySelectorAll('a, button').forEach(function (el) {
-      el.addEventListener('mouseenter', function () { cursor.classList.add('grow'); });
-      el.addEventListener('mouseleave', function () { cursor.classList.remove('grow'); });
-    });
-  }
-
-  /* ══════════════════════════════════════
-     SCROLL FADE-IN
-     ══════════════════════════════════════ */
-  function initScrollFade() {
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        if (e.isIntersecting) {
-          e.target.style.opacity   = '1';
-          e.target.style.transform = 'translateY(0)';
-        }
-      });
-    }, { threshold: 0.08 });
-
-    document.querySelectorAll('section').forEach(function (el) {
-      el.style.opacity    = '0';
-      el.style.transform  = 'translateY(18px)';
-      el.style.transition = 'opacity 0.55s ease, transform 0.55s ease';
-      io.observe(el);
-    });
-  }
-
-  /* ══════════════════════════════════════
-     INIT  (runs on DOMContentLoaded)
-     ══════════════════════════════════════ */
-  document.addEventListener('DOMContentLoaded', function () {
-
-    /* restore preferences */
-    var savedTheme = localStorage.getItem('alvakry_theme') ||
-      (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-    var savedLang  = localStorage.getItem('alvakry_lang') || 'en';
-    applyTheme(savedTheme);
-    setLang(savedLang);
-
-    /* theme buttons */
-    ['themeBtn', 'themeBtnMobile'].forEach(function (id) {
-      var btn = document.getElementById(id);
-      if (btn) btn.addEventListener('click', toggleTheme);
-    });
-
-    /* hamburger */
-    var hamburger = document.getElementById('hamburger');
-    if (hamburger) {
-      hamburger.addEventListener('click', function () {
-        toggleMenu(!hamburger.classList.contains('open'));
-      });
+    function toggle(open) {
+      hamburger.classList.toggle('open', open);
+      drawer.classList.toggle('open', open);
+      hamburger.setAttribute('aria-expanded', String(open));
+      drawer.setAttribute('aria-hidden', String(!open));
+      document.body.style.overflow = open ? 'hidden' : '';
     }
 
-    /* drawer links close menu */
-    document.querySelectorAll('.drawer-link').forEach(function (l) {
-      l.addEventListener('click', function () { toggleMenu(false); });
-    });
-
-    /* Escape closes drawer */
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') toggleMenu(false);
-    });
-
-    initCursor();
-    initScrollFade();
+    hamburger.addEventListener('click', () => toggle(!hamburger.classList.contains('open')));
+    document.querySelectorAll('.drawer-link').forEach(l => l.addEventListener('click', () => toggle(false)));
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') toggle(false); });
   });
+})();
 
+
+/* ─── ACTIVE NAV ─── */
+(function initActiveNav() {
+  document.addEventListener('DOMContentLoaded', () => {
+    const navLinks = document.querySelectorAll('.nav-links a[href^="#"]');
+    if (!navLinks.length) return;
+
+    const linkMap = new Map();
+    navLinks.forEach(l => linkMap.set(l.getAttribute('href').slice(1), l));
+
+    let current = null;
+
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (!entry.isIntersecting) return;
+        const id = entry.target.id;
+        if (!linkMap.has(id)) return;
+        if (current) current.classList.remove('active');
+        current = linkMap.get(id);
+        current.classList.add('active');
+      });
+    }, { threshold: 0.4 });
+
+    document.querySelectorAll('section[id]').forEach(s => obs.observe(s));
+  });
 })();
