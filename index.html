@@ -1,347 +1,437 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light" data-lang="en">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="URL X-Ray — Find out where shortened URLs lead to without clicking. Safe URL expander tool.">
-  <meta name="keywords" content="url expander, url xray, short urls, tinyurl, bit.ly, safe link checker">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src 'self' https://api.allorigins.win https://corsproxy.io; style-src 'self' 'unsafe-inline'; font-src https://fonts.gstatic.com; img-src 'self' data:;">
-  <meta http-equiv="X-Content-Type-Options" content="nosniff">
   <meta name="referrer" content="no-referrer">
   <title>URL X-Ray — Expand Shortened URLs Safely</title>
   <link rel="icon" type="image/png" href="favicon.png">
 
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <!-- font-display=swap baked into Google Fonts URL for faster perceived load -->
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet" />
 
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<!-- Custom cursor -->
-<div class="cursor" id="cursor"></div>
+  <!-- SCROLL PROGRESS -->
+  <div class="scroll-progress"></div>
 
-<!-- Skip nav -->
-<a href="#main-content" class="skip-nav">Skip to content</a>
+  <!-- CURSOR -->
+  <div class="cursor"></div>
+  <div class="cursor-ring"></div>
 
-<!-- ══════════════════════════════════════
-     NAV
-     ══════════════════════════════════════ -->
-<div class="container">
+  <!-- ═══ NAV ═══ -->
   <nav class="nav">
-    <a class="nav-logo" href="/">URL<strong>X-RAY</strong><span class="dim">.exe</span></a>
+    <div class="nav-inner">
+      <a href="/" class="nav-logo">
+        <div class="nav-logo-mark">
+          <svg viewBox="0 0 12 12" xmlns="http://www.w3.org/2000/svg">
+            <rect x="1" y="1" width="4" height="4" rx="1"/>
+            <rect x="7" y="1" width="4" height="4" rx="1"/>
+            <rect x="1" y="7" width="4" height="4" rx="1"/>
+            <rect x="7" y="7" width="4" height="4" rx="1" opacity="0.4"/>
+          </svg>
+        </div>
+        urlxray<span>.exe</span>
+      </a>
 
-    <ul class="nav-links">
-      <li><a href="#how-it-works">how it works</a></li>
-      <li><a href="#shorteners">shorteners</a></li>
-      <li><a href="#why">why</a></li>
-    </ul>
+      <ul class="nav-links">
+        <li><a href="#how-it-works">How it works</a></li>
+        <li><a href="#shorteners">Shorteners</a></li>
+        <li><a href="#why">Why</a></li>
+        <li>
+          <button class="theme-btn" id="themeBtn" aria-label="Toggle theme">
+            <!-- moon icon (shown in light mode) -->
+            <svg class="icon-moon" id="themeIcon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+            </svg>
+            <!-- sun icon (shown in dark mode) -->
+            <svg class="icon-sun" id="themeIconSun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="5"/>
+              <line x1="12" y1="1" x2="12" y2="3"/>
+              <line x1="12" y1="21" x2="12" y2="23"/>
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+              <line x1="1" y1="12" x2="3" y2="12"/>
+              <line x1="21" y1="12" x2="23" y2="12"/>
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+            </svg>
+          </button>
+        </li>
+      </ul>
 
-    <div class="nav-controls">
-      <button class="pill-btn" id="themeBtn" aria-label="Toggle theme">
-        <span id="themeIcon">☾</span>
-        <span id="themeLabel">dark</span>
+      <!-- hamburger -->
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
       </button>
     </div>
-
-    <button class="hamburger" id="hamburger" aria-label="Toggle menu" aria-expanded="false">
-      <span></span><span></span><span></span>
-    </button>
   </nav>
-</div>
 
-<!-- Mobile drawer -->
-<div class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
-  <ul>
-    <li><a href="#how-it-works" class="drawer-link">how it works</a></li>
-    <li><a href="#shorteners"   class="drawer-link">shorteners</a></li>
-    <li><a href="#why"          class="drawer-link">why</a></li>
-  </ul>
-  <div class="drawer-controls">
-    <button class="pill-btn" id="themeBtnMobile" aria-label="Toggle theme">
-      <span id="themeIconM">☾</span>
-      <span id="themeLabelM">dark</span>
-    </button>
-  </div>
-  <p class="drawer-foot">URLXRAY.exe — v2.0</p>
-</div>
+  <!-- Mobile drawer -->
+  <div class="mobile-drawer" id="mobileDrawer" aria-hidden="true">
+    <!-- close button -->
+    <button class="drawer-close" id="drawerClose" aria-label="Close menu">✕</button>
 
-<!-- ══════════════════════════════════════
-     MARQUEE
-     ══════════════════════════════════════ -->
-<div class="marquee-wrap" aria-hidden="true">
-  <div class="marquee-track">
-    <!-- set A -->
-    <span class="marquee-item"><span class="star">✦</span> safe link preview</span>
-    <span class="marquee-item"><span class="star">✦</span> no click required</span>
-    <span class="marquee-item"><span class="star">✦</span> zero tracking</span>
-    <span class="marquee-item"><span class="star">✦</span> follows redirects</span>
-    <span class="marquee-item"><span class="star">✦</span> instant results</span>
-    <span class="marquee-item"><span class="star">✦</span> always free</span>
-    <span class="marquee-item"><span class="star">✦</span> open source</span>
-    <span class="marquee-item"><span class="star">✦</span> bit.ly</span>
-    <span class="marquee-item"><span class="star">✦</span> tinyurl</span>
-    <span class="marquee-item"><span class="star">✦</span> t.co</span>
-    <!-- set B (identical copy for seamless loop) -->
-    <span class="marquee-item" aria-hidden="true"><span class="star">✦</span> safe link preview</span>
-    <span class="marquee-item" aria-hidden="true"><span class="star">✦</span> no click required</span>
-    <span class="marquee-item" aria-hidden="true"><span class="star">✦</span> zero tracking</span>
-    <span class="marquee-item" aria-hidden="true"><span class="star">✦</span> follows redirects</span>
-    <span class="marquee-item" aria-hidden="true"><span class="star">✦</span> instant results</span>
-    <span class="marquee-item" aria-hidden="true"><span class="star">✦</span> always free</span>
-    <span class="marquee-item" aria-hidden="true"><span class="star">✦</span> open source</span>
-    <span class="marquee-item" aria-hidden="true"><span class="star">✦</span> bit.ly</span>
-    <span class="marquee-item" aria-hidden="true"><span class="star">✦</span> tinyurl</span>
-    <span class="marquee-item" aria-hidden="true"><span class="star">✦</span> t.co</span>
-  </div>
-</div>
-
-<div class="container">
-
-  <!-- ══════════════════════════════════════
-       HERO / TOOL SECTION
-       ══════════════════════════════════════ -->
-  <section class="hero-section" id="main-content">
-
-    <div class="status" style="margin-bottom: 2.5rem;">
-      <span class="status-dot"></span>
-      <span>online — no clicks. no risk.</span>
+    <ul>
+      <li><a href="#home"          class="drawer-link">Home</a></li>
+      <li><a href="#how-it-works"  class="drawer-link">How it works</a></li>
+      <li><a href="#shorteners"    class="drawer-link">Shorteners</a></li>
+      <li><a href="#why"           class="drawer-link">Why</a></li>
+    </ul>
+    <div class="drawer-controls">
+      <button class="theme-btn" id="themeBtnMobile" aria-label="Toggle theme">
+        <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
+      <span class="drawer-theme-label" id="drawerThemeLabel">Switch to dark</span>
     </div>
+    <p class="drawer-foot">urlxray.exe — v2.0</p>
+  </div>
 
-    <div class="hero-tag">v2.0 — URL EXPANDER</div>
+  <div class="wrap">
 
-    <h1 class="display">
-      Where does this<br>link <em class="glitch" data-text="really go?">really go?</em>
-    </h1>
+    <!-- ═══ HERO ═══ -->
+    <section class="section hero" id="home">
 
-    <p class="subtitle" style="margin-bottom: 3rem;">
-      Paste any shortened URL to reveal its destination <strong>before</strong> you click it.
-      No account. No tracking. Instant.
-    </p>
+      <div class="hero-eyebrow">
+        <span class="status-dot">online — no clicks. no risk.</span>
+        <span class="hero-divider"></span>
+        <span class="hero-location">URL Expander · v2.0</span>
+      </div>
 
-    <!-- Tool card -->
-    <div class="tool-card" role="region" aria-label="URL expander tool">
-      <form id="xrayForm" novalidate>
-        <label for="shortenedUrl" class="input-label">Shortened URL</label>
-        <div class="input-group">
-          <input
-            type="text"
-            id="shortenedUrl"
-            name="shortenedUrl"
-            placeholder="https://bit.ly/abc123"
-            required
-            autocomplete="off"
-            spellcheck="false"
-            aria-describedby="input-hint"
-          >
-          <button type="submit" id="xrayBtn" aria-label="X-Ray this URL">
-            <span class="btn-icon" aria-hidden="true">→</span>
-            <span class="btn-text">X-RAY</span>
-          </button>
-        </div>
-        <span id="input-hint" style="display:none;">Enter a shortened URL starting with http:// or https://</span>
-      </form>
+      <h1 class="hero-title">
+        Where does<br/>
+        <span class="line-muted">this link</span><br/>
+        <span class="line-accent">really go?</span>
+      </h1>
 
-      <!-- Results -->
-      <div id="resultArea" class="result-area hidden" aria-live="polite" aria-atomic="true">
+      <p class="hero-desc">
+        Paste any shortened URL to reveal its destination <strong>before</strong> you click it.
+        No account. No tracking. Instant.
+      </p>
 
-        <div id="loadingState" class="state loading-state hidden" aria-busy="true">
-          <div class="spinner" aria-hidden="true"></div>
-          <p class="mono-sm">Following redirects…</p>
-        </div>
-
-        <div id="successState" class="state success-state hidden" role="status">
-          <div class="result-header">
-            <span class="result-status-label">✓ Destination found</span>
-          </div>
-          <a id="resultUrl" href="#" target="_blank" rel="noopener noreferrer" class="result-link"></a>
-          <div class="result-meta">
-            <span id="redirectCount" class="tag"></span>
-            <span id="finalDomain"   class="tag tag-accent"></span>
-          </div>
-          <div class="result-actions">
-            <button class="btn-outline btn-copy" aria-label="Copy resolved URL to clipboard">
-              Copy URL
+      <!-- ═══ TOOL CARD ═══ -->
+      <div class="tool-card" role="region" aria-label="URL expander tool">
+        <form id="xrayForm" novalidate>
+          <label for="shortenedUrl" class="input-label">Shortened URL</label>
+          <div class="input-group">
+            <input
+              type="text"
+              id="shortenedUrl"
+              name="shortenedUrl"
+              placeholder="https://bit.ly/abc123"
+              required
+              autocomplete="off"
+              spellcheck="false"
+              aria-describedby="input-hint"
+            >
+            <button type="submit" id="xrayBtn" class="btn btn-dark" aria-label="X-Ray this URL">
+              <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              X-RAY
             </button>
-            <a id="openLink" href="#" target="_blank" rel="noopener noreferrer" class="btn-outline btn-open" aria-label="Open destination URL in new tab">
-              ↗ Open safely
-            </a>
+          </div>
+          <span id="input-hint" style="display:none;">Enter a shortened URL starting with http:// or https://</span>
+        </form>
+
+        <!-- Results -->
+        <div id="resultArea" class="result-area hidden" aria-live="polite" aria-atomic="true">
+
+          <!-- ── Loading ── -->
+          <div id="loadingState" class="state loading-state hidden" aria-busy="true">
+            <div class="loader-wrap" aria-hidden="true">
+              <svg class="loader-ring" viewBox="0 0 50 50">
+                <circle class="loader-track" cx="25" cy="25" r="20" fill="none" stroke-width="3"/>
+                <circle class="loader-fill"  cx="25" cy="25" r="20" fill="none" stroke-width="3"
+                  stroke-dasharray="126" stroke-dashoffset="94"/>
+              </svg>
+              <span class="loader-dot"></span>
+            </div>
+            <div class="loader-text">
+              <p class="loader-heading">Following redirects</p>
+              <p class="loader-sub">Tracing the link chain…</p>
+            </div>
+          </div>
+
+          <!-- ── Success ── -->
+          <div id="successState" class="state success-state hidden" role="status">
+            <div class="success-top">
+              <div class="success-icon" aria-hidden="true">
+                <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M4 10l4 4 8-8" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <div>
+                <p class="result-status-label">Destination found</p>
+                <div class="result-tags">
+                  <span id="redirectCount" class="tag"></span>
+                  <span id="finalDomain"   class="tag tag-accent"></span>
+                </div>
+              </div>
+            </div>
+
+            <div class="result-url-box">
+              <p class="result-url-label">Final URL</p>
+              <a id="resultUrl" href="#" target="_blank" rel="noopener noreferrer" class="result-link"></a>
+            </div>
+
+            <div class="result-actions">
+              <button class="btn btn-outline btn-copy" aria-label="Copy resolved URL to clipboard">
+                <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="4" y="4" width="8" height="8" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
+                  <path d="M4 10H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v1"
+                    stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+                </svg>
+                Copy URL
+              </button>
+              <a id="openLink" href="#" target="_blank" rel="noopener noreferrer"
+                class="btn btn-dark btn-open" aria-label="Open destination URL in new tab">
+                <svg viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5"
+                    stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Open safely
+              </a>
+            </div>
+          </div>
+
+          <!-- ── Error ── -->
+          <div id="errorState" class="state error-state hidden" role="alert">
+            <div class="error-top">
+              <div class="error-icon" aria-hidden="true">
+                <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M10 6v4M10 14h.01" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round"/>
+                  <circle cx="10" cy="10" r="8" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+              </div>
+              <p id="errorMsg" class="error-msg"></p>
+            </div>
+            <p class="result-meta-text" style="margin-top: 0.75rem;">
+              Make sure the URL starts with <code>http://</code> or <code>https://</code>
+            </p>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ═══ HOW IT WORKS ═══ -->
+    <section class="section reveal" id="how-it-works">
+      <div class="section-header">
+        <span class="section-num">01</span>
+        <span class="section-label">How it works</span>
+        <span class="section-rule"></span>
+      </div>
+
+      <div class="steps-grid" data-stagger>
+
+        <a class="step-item">
+          <div class="step-item-bg"></div>
+          <div class="step-main">
+            <div class="step-num">01</div>
+            <h3>Paste the link</h3>
+            <p class="body-text">Copy any shortened URL from email, a text message, or social media and paste it above.</p>
+          </div>
+          <div class="step-side">
+            <span class="step-arrow">→</span>
+          </div>
+        </a>
+
+        <a class="step-item">
+          <div class="step-item-bg"></div>
+          <div class="step-main">
+            <div class="step-num">02</div>
+            <h3>We follow redirects</h3>
+            <p class="body-text">The tool traces every redirect hop through our proxy until it reaches the final destination.</p>
+          </div>
+          <div class="step-side">
+            <span class="step-arrow">→</span>
+          </div>
+        </a>
+
+        <a class="step-item">
+          <div class="step-item-bg"></div>
+          <div class="step-main">
+            <div class="step-num">03</div>
+            <h3>See the destination</h3>
+            <p class="body-text">You get the real URL — decide for yourself if it is safe to visit before clicking anything.</p>
+          </div>
+          <div class="step-side">
+            <span class="step-arrow">→</span>
+          </div>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- ═══ POPULAR SHORTENERS ═══ -->
+    <section class="section reveal" id="shorteners">
+      <div class="section-header">
+        <span class="section-num">02</span>
+        <span class="section-label">Popular shorteners</span>
+        <span class="section-rule"></span>
+      </div>
+
+      <div class="post-list" data-stagger>
+
+        <a href="https://bit.ly" target="_blank" rel="noopener noreferrer" class="post-item">
+          <div class="post-item-bg"></div>
+          <span class="post-title">bit.ly</span>
+          <div class="post-right">
+            <span class="post-tag">Bitly</span>
+            <span class="post-arrow">↗</span>
+          </div>
+        </a>
+
+        <a href="https://tinyurl.com" target="_blank" rel="noopener noreferrer" class="post-item">
+          <div class="post-item-bg"></div>
+          <span class="post-title">tinyurl.com</span>
+          <div class="post-right">
+            <span class="post-tag">TinyURL</span>
+            <span class="post-arrow">↗</span>
+          </div>
+        </a>
+
+        <a href="https://is.gd" target="_blank" rel="noopener noreferrer" class="post-item">
+          <div class="post-item-bg"></div>
+          <span class="post-title">is.gd</span>
+          <div class="post-right">
+            <span class="post-tag">is.gd</span>
+            <span class="post-arrow">↗</span>
+          </div>
+        </a>
+
+        <a href="https://shorturl.at" target="_blank" rel="noopener noreferrer" class="post-item">
+          <div class="post-item-bg"></div>
+          <span class="post-title">shorturl.at</span>
+          <div class="post-right">
+            <span class="post-tag">ShortURL</span>
+            <span class="post-arrow">↗</span>
+          </div>
+        </a>
+
+        <a href="https://ow.ly" target="_blank" rel="noopener noreferrer" class="post-item">
+          <div class="post-item-bg"></div>
+          <span class="post-title">ow.ly</span>
+          <div class="post-right">
+            <span class="post-tag">Hootsuite</span>
+            <span class="post-arrow">↗</span>
+          </div>
+        </a>
+
+        <a href="https://t.co" target="_blank" rel="noopener noreferrer" class="post-item">
+          <div class="post-item-bg"></div>
+          <span class="post-title">t.co</span>
+          <div class="post-right">
+            <span class="post-tag">Twitter/X</span>
+            <span class="post-arrow">↗</span>
+          </div>
+        </a>
+
+        <a href="https://rb.gy" target="_blank" rel="noopener noreferrer" class="post-item">
+          <div class="post-item-bg"></div>
+          <span class="post-title">rb.gy</span>
+          <div class="post-right">
+            <span class="post-tag">Rebrandly</span>
+            <span class="post-arrow">↗</span>
+          </div>
+        </a>
+
+        <a href="https://cutt.ly" target="_blank" rel="noopener noreferrer" class="post-item">
+          <div class="post-item-bg"></div>
+          <span class="post-title">cutt.ly</span>
+          <div class="post-right">
+            <span class="post-tag">Cutt.ly</span>
+            <span class="post-arrow">↗</span>
+          </div>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- ═══ WHY ═══ -->
+    <section class="section reveal" id="why">
+      <div class="section-header">
+        <span class="section-num">03</span>
+        <span class="section-label">Why use URL X-Ray?</span>
+        <span class="section-rule"></span>
+      </div>
+
+      <div class="stack-grid" data-stagger>
+
+        <div class="stack-col">
+          <p class="stack-col-label">Safety</p>
+          <div class="stack-items">
+            <span class="stack-item"><span class="stack-item-dot"></span>No clicking required</span>
+            <span class="stack-item"><span class="stack-item-dot"></span>Phishing protection</span>
+            <span class="stack-item"><span class="stack-item-dot"></span>Malware prevention</span>
           </div>
         </div>
 
-        <div id="errorState" class="state error-state hidden" role="alert">
-          <p id="errorMsg" class="error-msg"></p>
-          <p class="mono-sm" style="margin-top: 0.4rem;">
-            Make sure the URL starts with <code>http://</code> or <code>https://</code>
-          </p>
+        <div class="stack-col">
+          <p class="stack-col-label">Privacy</p>
+          <div class="stack-items">
+            <span class="stack-item"><span class="stack-item-dot"></span>Zero URL storage</span>
+            <span class="stack-item"><span class="stack-item-dot"></span>No account needed</span>
+            <span class="stack-item"><span class="stack-item-dot"></span>No tracking, ever</span>
+          </div>
+        </div>
+
+        <div class="stack-col">
+          <p class="stack-col-label">Features</p>
+          <div class="stack-items">
+            <span class="stack-item"><span class="stack-item-dot"></span>Instant results</span>
+            <span class="stack-item"><span class="stack-item-dot"></span>Follows all redirects</span>
+            <span class="stack-item"><span class="stack-item-dot"></span>Always free &amp; open source</span>
+          </div>
         </div>
 
       </div>
-    </div>
-  </section>
+    </section>
 
-  <!-- ══════════════════════════════════════
-       HOW IT WORKS
-       ══════════════════════════════════════ -->
-  <section id="how-it-works">
-    <p class="label">How it works</p>
+  </div><!-- /wrap -->
 
-    <div class="steps-grid">
-
-      <div class="step-card">
-        <div class="step-number">01</div>
-        <h3>Paste the link</h3>
-        <p class="body-text">Copy any shortened URL from email, a text message, or social media.</p>
-      </div>
-
-      <div class="step-card">
-        <div class="step-number">02</div>
-        <h3>We follow redirects</h3>
-        <p class="body-text">The tool traces every redirect hop until it reaches the final destination.</p>
-      </div>
-
-      <div class="step-card">
-        <div class="step-number">03</div>
-        <h3>See the destination</h3>
-        <p class="body-text">You get the real URL — decide for yourself if it is safe to visit.</p>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- ══════════════════════════════════════
-       POPULAR SHORTENERS
-       ══════════════════════════════════════ -->
-  <section id="shorteners">
-    <p class="label">Popular shorteners</p>
-    <p class="body-text" style="margin-bottom: 2rem;">Works with all major services, including:</p>
-
-    <div class="shorteners-grid">
-      <a href="https://bit.ly"       target="_blank" rel="noopener noreferrer" class="row-item shortener-item" aria-label="bit.ly">
-        <span class="row-title">bit.ly</span>
-        <span class="row-meta">↗</span>
-      </a>
-      <a href="https://tinyurl.com"  target="_blank" rel="noopener noreferrer" class="row-item shortener-item" aria-label="tinyurl.com">
-        <span class="row-title">tinyurl.com</span>
-        <span class="row-meta">↗</span>
-      </a>
-      <a href="https://is.gd"        target="_blank" rel="noopener noreferrer" class="row-item shortener-item" aria-label="is.gd">
-        <span class="row-title">is.gd</span>
-        <span class="row-meta">↗</span>
-      </a>
-      <a href="https://shorturl.at"  target="_blank" rel="noopener noreferrer" class="row-item shortener-item" aria-label="shorturl.at">
-        <span class="row-title">shorturl.at</span>
-        <span class="row-meta">↗</span>
-      </a>
-      <a href="https://ow.ly"        target="_blank" rel="noopener noreferrer" class="row-item shortener-item" aria-label="ow.ly">
-        <span class="row-title">ow.ly</span>
-        <span class="row-meta">↗</span>
-      </a>
-      <a href="https://t.co"         target="_blank" rel="noopener noreferrer" class="row-item shortener-item" aria-label="t.co">
-        <span class="row-title">t.co</span>
-        <span class="row-meta">↗</span>
-      </a>
-      <a href="https://rb.gy"        target="_blank" rel="noopener noreferrer" class="row-item shortener-item" aria-label="rb.gy">
-        <span class="row-title">rb.gy</span>
-        <span class="row-meta">↗</span>
-      </a>
-      <a href="https://cutt.ly"      target="_blank" rel="noopener noreferrer" class="row-item shortener-item" aria-label="cutt.ly">
-        <span class="row-title">cutt.ly</span>
-        <span class="row-meta">↗</span>
-      </a>
-    </div>
-  </section>
-
-  <!-- ══════════════════════════════════════
-       WHY
-       ══════════════════════════════════════ -->
-  <section id="why">
-    <p class="label">Why use URL X-Ray?</p>
-
-    <div class="features-grid">
-
-      <div class="feature-card">
-        <div class="feature-icon">🛡</div>
-        <h3>Stay safe online</h3>
-        <p class="body-text">Verify links before clicking to avoid phishing sites, malware, or spam.</p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon">◎</div>
-        <h3>Zero tracking</h3>
-        <p class="body-text">We do not store your URLs or track your activity. Ever.</p>
-      </div>
-
-      <div class="feature-card">
-        <div class="feature-icon">⚡</div>
-        <h3>Fast and free</h3>
-        <p class="body-text">Instant results with no account required. Always free to use.</p>
-      </div>
-
-    </div>
-  </section>
-
-  <!-- ══════════════════════════════════════
-       FOOTER
-       ══════════════════════════════════════ -->
+  <!-- ═══ FOOTER ═══ -->
   <footer class="footer">
-    <span class="mono-sm">
-      © 2026 <strong style="color: var(--fg);">URL X-Ray</strong> — a safe way to inspect shortened links.
-    </span>
-    <span class="mono-sm" style="font-style: italic;">
-      open source by
-      <a href="https://github.com/alvakry" target="_blank" rel="noopener noreferrer" style="color: var(--accent-text); text-decoration: none; font-weight: 700;">@alvakry</a>
-    </span>
+    <div class="wrap footer-inner">
+      <div class="footer-brand">
+        <span class="footer-name">URL X-Ray</span>
+        <span class="footer-copy">© 2026 — Inspect shortened links safely.</span>
+      </div>
+
+      <nav class="footer-links">
+        <a href="#how-it-works">How it works</a>
+        <a href="#shorteners">Shorteners</a>
+        <a href="#why">Why</a>
+      </nav>
+
+      <a href="#home" class="footer-back">
+        Back to top
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 10V2M2 6l4-4 4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </div>
   </footer>
 
-</div><!-- /container -->
-
-<script src="app.js"></script>
-<script src="theme.js"></script>
-<script>
-  /* ── Marquee: duplicate items inside track, animate the whole track ── */
-  (function () {
-    var track = document.getElementById('marqueeTrack');
-    if (!track) return;
-
-    /* Grab all original items (set A) */
-    var originalItems = Array.prototype.slice.call(track.children);
-
-    /* Clone each item and append inside the SAME track (A + A = seamless) */
-    originalItems.forEach(function (item) {
-      var clone = item.cloneNode(true);
-      clone.setAttribute('aria-hidden', 'true');
-      track.appendChild(clone);
-    });
-
-    /* After fonts load, measure set A width and set animation duration */
-    function start() {
-      /* set A width = half of total track scrollWidth */
-      var setWidth = track.scrollWidth / 2;
-      var pxPerSec = 80; /* pixels per second — increase to speed up */
-      var duration = setWidth / pxPerSec;
-
-      var style = document.createElement('style');
-      style.textContent =
-        '@keyframes marquee-scroll {' +
-        '  from { transform: translateX(0); }' +
-        '  to   { transform: translateX(-' + setWidth + 'px); }' +
-        '}' +
-        '#marqueeTrack {' +
-        '  animation: marquee-scroll ' + duration + 's linear infinite;' +
-        '}' +
-        '#marqueeTrack:hover { animation-play-state: paused; }';
-      document.head.appendChild(style);
-    }
-
-    if (document.fonts && document.fonts.ready) {
-      document.fonts.ready.then(start);
-    } else {
-      window.addEventListener('load', start);
-    }
-  })();
-</script>
+  <script src="app.js"></script>
+  <script src="theme.js"></script>
 </body>
 </html>
